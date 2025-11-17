@@ -1,0 +1,21 @@
+{
+  "name": "hostcenter.lg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:30873/git/hostcenterlg/hostcenter.lg"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "better-sqlite3": "^12.4.1",
+    "prisma": "^5.0.0"
+  }
+}

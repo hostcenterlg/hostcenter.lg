@@ -1,0 +1,406 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// AUTH & USERS
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("OWNER")
+
+  stores        Store[]
+  sessions      Session[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ==========================================
+// STORE (Multi-tenant)
+// ==========================================
+
+model Store {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  cnpj        String?
+  logo        String?
+  banner      String?
+  slogan      String?
+  about       String?
+
+  language    String   @default("pt-BR")
+  currency    String   @default("BRL")
+  timezone    String   @default("America/Sao_Paulo")
+
+  phone       String?
+  whatsapp    String?
+  email       String?
+  website     String?
+
+  street      String?
+  number      String?
+  complement  String?
+  neighborhood String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String   @default("BR")
+
+  isActive    Boolean  @default(true)
+  plan        String   @default("FREE")
+
+  onboardingCompleted Boolean @default(false)
+  onboardingData      String?
+
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  products    Product[]
+  categories  Category[]
+  customers   Customer[]
+  orders      Order[]
+  promotions  Promotion[]
+  coupons     Coupon[]
+  highlights  Highlight[]
+  salespeople Salesperson[]
+  settings    StoreSettings?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("stores")
+}
+
+model StoreSettings {
+  id                    String  @id @default(cuid())
+  storeId               String  @unique
+
+  showOutOfStock        Boolean @default(false)
+  productOrder          String  @default("alphabetical")
+  ageRestriction        Boolean @default(false)
+
+  shippingType          String  @default("free")
+  shippingValue         Float   @default(0)
+  freeShippingAbove     Float?
+
+  paymentMethods        String  @default("[]")
+  qrCodeColors          String?
+
+  store                 Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("store_settings")
+}
+
+// ==========================================
+// PRODUCTS
+// ==========================================
+
+model Category {
+  id          String    @id @default(cuid())
+  storeId     String
+  name        String
+  description String?
+  image       String?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products    Product[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([storeId, name])
+  @@map("categories")
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  storeId       String
+  categoryId    String?
+
+  name          String
+  description   String?
+  sku           String?
+  barcode       String?
+
+  price         Float
+  comparePrice  Float?
+  cost          Float?
+
+  images        String    @default("[]")
+
+  stock         Int       @default(0)
+  trackStock    Boolean   @default(true)
+
+  isActive      Boolean   @default(true)
+  isFeatured    Boolean   @default(false)
+
+  slug          String
+  metaTitle     String?
+  metaDescription String?
+
+  aiGenerated   Boolean   @default(false)
+
+  store         Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  orderItems    OrderItem[]
+  promotionItems PromotionProduct[]
+  highlights    Highlight[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([storeId, slug])
+  @@map("products")
+}
+
+// ==========================================
+// CUSTOMERS
+// ==========================================
+
+model Customer {
+  id          String    @id @default(cuid())
+  storeId     String
+
+  name        String
+  email       String?
+  phone       String?
+  cpf         String?
+
+  street      String?
+  number      String?
+  complement  String?
+  neighborhood String?
+  city        String?
+  state       String?
+  zipCode     String?
+
+  tags        String    @default("[]")
+  notes       String?
+  birthDate   DateTime?
+  specialDates String   @default("[]")
+
+  buyingBehavior String?
+  preferences    String?
+
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders      Order[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([storeId, email])
+  @@unique([storeId, phone])
+  @@map("customers")
+}
+
+// ==========================================
+// ORDERS
+// ==========================================
+
+model Order {
+  id              String      @id @default(cuid())
+  storeId         String
+  customerId      String
+  salespersonId   String?
+
+  code            String      @unique
+
+  subtotal        Float
+  discount        Float       @default(0)
+  shipping        Float       @default(0)
+  total           Float
+
+  couponId        String?
+  couponCode      String?
+
+  status          String      @default("PENDING")
+  paymentStatus   String      @default("PENDING")
+  shippingStatus  String      @default("PENDING")
+
+  shippingMethod  String?
+  trackingCode    String?
+
+  notes           String?
+  customerNotes   String?
+
+  store           Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  salesperson     Salesperson? @relation(fields: [salespersonId], references: [id])
+  coupon          Coupon?     @relation(fields: [couponId], references: [id])
+
+  items           OrderItem[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  productId   String
+
+  name        String
+  sku         String?
+  price       Float
+  quantity    Int
+  subtotal    Float
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// ==========================================
+// PROMOTIONS & COUPONS
+// ==========================================
+
+model Promotion {
+  id            String    @id @default(cuid())
+  storeId       String
+
+  name          String
+  description   String?
+  type          String
+
+  discountType  String
+  discountValue Float
+
+  scope         String    @default("SITEWIDE")
+
+  startAt       DateTime
+  endAt         DateTime?
+
+  isActive      Boolean   @default(true)
+  priority      Int       @default(0)
+
+  store         Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products      PromotionProduct[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("promotions")
+}
+
+model PromotionProduct {
+  promotionId   String
+  productId     String
+
+  promotion     Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([promotionId, productId])
+  @@map("promotion_products")
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  storeId       String
+
+  code          String
+  description   String?
+
+  discountType  String
+  discountValue Float
+
+  minPurchase   Float?
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  perCustomer   Int       @default(1)
+
+  validFrom     DateTime
+  validTo       DateTime?
+
+  isActive      Boolean   @default(true)
+
+  store         Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders        Order[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([storeId, code])
+  @@map("coupons")
+}
+
+// ==========================================
+// MARKETING
+// ==========================================
+
+model Highlight {
+  id          String   @id @default(cuid())
+  storeId     String
+  productId   String
+
+  position    Int
+  title       String?
+  showPrice   Boolean  @default(true)
+  isActive    Boolean  @default(true)
+
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([storeId, position])
+  @@map("highlights")
+}
+
+// ==========================================
+// SALESPEOPLE
+// ==========================================
+
+model Salesperson {
+  id          String   @id @default(cuid())
+  storeId     String
+
+  name        String
+  email       String?
+  phone       String?
+
+  catalogUrl  String?  @unique
+
+  isActive    Boolean  @default(true)
+
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders      Order[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([storeId, email])
+  @@map("salespeople")
+}
