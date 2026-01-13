@@ -9,7 +9,6 @@ import {
   AIObjectionDetection,
   AINextBestAction,
   AIDraftReply,
-  AISuggestion,
   Interaction,
   Customer,
 } from '../types';
@@ -98,10 +97,10 @@ export function meetsConfidenceThreshold(confidence: number, threshold: number):
 
 // ============ MOCK RESPONSES ============
 
-function createMockLog(
+function createMockLog<T extends object>(
   functionName: string,
-  input: Record<string, unknown>,
-  output: Record<string, unknown>,
+  input: object,
+  output: T,
   confidence: number | null,
   latencyMs: number = Math.floor(Math.random() * 200) + 50
 ): AIRunLog {
@@ -113,8 +112,8 @@ function createMockLog(
     prompt_tokens: Math.floor(JSON.stringify(input).length / 4),
     completion_tokens: Math.floor(JSON.stringify(output).length / 4),
     latency_ms: latencyMs,
-    input,
-    output,
+    input: input as Record<string, unknown>,
+    output: output as Record<string, unknown>,
     confidence,
     created_at: new Date(),
   };
@@ -362,7 +361,7 @@ export async function suggestNextBestAction(
   }
 
   if (recentInteractions.length > 0) {
-    const lastInteraction = recentInteractions[0];
+    const lastInteraction = recentInteractions[0]!;
     if (!lastInteraction.responded_at) {
       suggestions.push({
         action: 'Responder mensagem pendente',

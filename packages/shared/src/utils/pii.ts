@@ -10,7 +10,7 @@ export type PIIFieldType = 'cpf' | 'cnpj' | 'phone' | 'email' | 'name';
 
 /**
  * Masks a CPF (Brazilian individual taxpayer ID)
- * Format: 123.456.789-00 -> 123.***.***-00
+ * Format: 123.456.789-00 -> 123.XXX.XXX-00 (masked)
  */
 export function maskCPF(cpf: string | null | undefined): string {
   if (!cpf) return '';
@@ -21,7 +21,7 @@ export function maskCPF(cpf: string | null | undefined): string {
 
 /**
  * Masks a CNPJ (Brazilian company taxpayer ID)
- * Format: 12.345.678/0001-90 -> 12.***.***/****-90
+ * Format: 12.345.678/0001-90 -> 12.XXX.XXX/XXXX-90 (masked)
  */
 export function maskCNPJ(cnpj: string | null | undefined): string {
   if (!cnpj) return '';
@@ -32,7 +32,7 @@ export function maskCNPJ(cnpj: string | null | undefined): string {
 
 /**
  * Masks a phone number
- * Format: +5511987654321 -> +5511****4321
+ * Format: +5511987654321 -> +5511XXXX4321 (masked)
  */
 export function maskPhone(phone: string | null | undefined): string {
   if (!phone) return '';
@@ -50,7 +50,7 @@ export function maskPhone(phone: string | null | undefined): string {
 
 /**
  * Masks an email address
- * Format: user@example.com -> us***@example.com
+ * Format: user@example.com -> usXXX@example.com (masked)
  */
 export function maskEmail(email: string | null | undefined): string {
   if (!email) return '';
@@ -68,7 +68,7 @@ export function maskEmail(email: string | null | undefined): string {
 
 /**
  * Masks a name (keeps first and last name initials)
- * Format: "João Silva Santos" -> "J*** S*** S***"
+ * Format: "Joao Silva Santos" -> "JXXX SXXX SXXX" (masked)
  */
 export function maskName(name: string | null | undefined): string {
   if (!name) return '';
