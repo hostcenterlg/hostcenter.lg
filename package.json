@@ -1,0 +1,25 @@
+{
+  "name": "vitao-jarvis-crm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VITAO JARVIS CRM - B2B AI-native CRM",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @jarvis/web dev",
+    "dev:worker": "pnpm --filter @jarvis/worker dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:unit": "pnpm --filter @jarvis/shared test",
+    "test:integration": "pnpm --filter @jarvis/database test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "db:migrate": "pnpm --filter @jarvis/database migrate",
+    "db:seed": "pnpm --filter @jarvis/database seed",
+    "csv:import": "pnpm --filter @jarvis/database csv:import",
+    "csv:seed-large": "pnpm --filter @jarvis/database csv:seed-large"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
