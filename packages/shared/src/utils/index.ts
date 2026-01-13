@@ -324,3 +324,42 @@ export function removeUndefined<T extends Record<string, unknown>>(obj: T): Part
   }
   return result;
 }
+
+// ============ RE-EXPORTS ============
+
+// PII Masking (LGPD)
+export {
+  maskCPF,
+  maskCNPJ,
+  maskPhone,
+  maskEmail,
+  maskName,
+  maskPII,
+  maskObjectPII,
+  maskCustomerPII,
+  CUSTOMER_PII_FIELDS,
+  createPIIAccessLog,
+  sanitizeForLogging,
+  type PIIFieldType,
+  type PIIAccessLogEntry,
+} from './pii';
+
+// Retry & Circuit Breaker
+export {
+  withRetry,
+  withRetryAndCircuitBreaker,
+  calculateRetryDelay,
+  isRetryableError,
+  sleep,
+  CircuitBreaker,
+  CircuitOpenError,
+  getCircuitBreaker,
+  resetAllCircuitBreakers,
+  CircuitState,
+  DEFAULT_RETRY_CONFIG,
+  DEFAULT_CIRCUIT_BREAKER_CONFIG,
+  type RetryConfig,
+  type RetryResult,
+  type CircuitBreakerConfig,
+  type CircuitBreakerState,
+} from './retry';
