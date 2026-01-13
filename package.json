@@ -15,6 +15,7 @@
     "typecheck": "pnpm -r typecheck",
     "db:migrate": "pnpm --filter @jarvis/database migrate",
     "db:seed": "pnpm --filter @jarvis/database seed",
+    "db:seed:demo": "pnpm --filter @jarvis/database seed:demo",
     "csv:import": "pnpm --filter @jarvis/database csv:import",
     "csv:seed-large": "pnpm --filter @jarvis/database csv:seed-large"
   },

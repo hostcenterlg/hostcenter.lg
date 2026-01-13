@@ -2,6 +2,127 @@
 
 B2B AI-native CRM com foco em produtividade de vendas e prevenção de churn.
 
+---
+
+## Quickstart (5 minutos)
+
+```bash
+# 1. Clone e instale
+git clone <repo-url> && cd vitao-jarvis-crm
+pnpm install
+
+# 2. Configure ambiente (copie e edite)
+cp .env.example .env
+
+# 3. Inicie Supabase local
+supabase start
+
+# 4. Execute migrations + seed demo
+pnpm db:migrate && pnpm db:seed:demo
+
+# 5. Inicie em modo demo
+DEMO_MODE=true pnpm dev:web
+
+# Acesse: http://localhost:3000
+```
+
+---
+
+## Demo Mode
+
+O modo demo habilita dataset rico e ferramentas para apresentações.
+
+### Ativar Demo Mode
+
+```bash
+# Variável de ambiente
+NEXT_PUBLIC_DEMO_MODE=true pnpm dev:web
+
+# Ou no .env
+NEXT_PUBLIC_DEMO_MODE=true
+```
+
+### Dataset Demo
+
+O seed demo cria:
+- 15 clientes (todos os lifecycle_status)
+- 25+ pedidos
+- 45+ interações (com sentimento)
+- 35+ tasks (todos os reason_codes)
+- 12+ kanban cards + 25 events
+- 5 exemplos DLQ
+
+```bash
+# Executar seed demo
+pnpm db:seed:demo
+```
+
+### Demo Toolbar
+
+Com DEMO_MODE=true, aparece uma barra flutuante com:
+- **Simular Webhook** - Dispara webhook de teste
+- **Gerar Relatório** - Cria relatório diário
+- **Inserir DLQ** - Adiciona item na fila de erros
+- **Reprocessar DLQ** - Reprocessa itens com erro
+- **Trigger IA** - Executa análise de IA
+
+---
+
+## Demo Path (Roteiro de Apresentação)
+
+### Checklist de Demo
+
+| # | Tela | O que mostrar | Tempo |
+|---|------|---------------|-------|
+| 1 | Login | Autenticação simples | 30s |
+| 2 | Hoje | Tarefas P1-P4, cores, motivos | 2min |
+| 3 | Cliente 360 | Tabs, métricas, IA insights | 2min |
+| 4 | Kanban | Pipeline, arrastar cards | 1min |
+| 5 | Dashboard | Relatório diário, gráficos | 1min |
+| 6 | Integrações | DLQ, reprocessamento | 1min |
+| 7 | Health | /api/health endpoints | 30s |
+
+### Script Detalhado
+
+1. **Login** (`/login`)
+   - Mostre tela de login limpa
+   - Entre com demo@vitao.com.br
+
+2. **Hoje** (`/hoje`)
+   - "Esta é a tela principal do vendedor"
+   - Mostre P1 vermelho: "Mensagens urgentes sem resposta"
+   - Mostre P2 laranja: "Ciclo de recompra vencendo"
+   - Clique em uma task, mostre o CTA
+
+3. **Cliente 360** (`/clientes/{id}`)
+   - Clique em um cliente da tela Hoje
+   - "Visão completa do cliente em um lugar"
+   - Tab Resumo: Métricas, vendedor, pipeline
+   - Tab Conversas: Sentimento colorido
+   - Tab IA: Insights automáticos
+
+4. **Kanban** (`/kanban`)
+   - "Pipeline visual de vendas"
+   - Arraste um card entre colunas
+   - "Cada movimento gera evento auditável"
+
+5. **Dashboard** (`/dashboard`)
+   - "Visão do gestor"
+   - Mostre gráficos de receita e lifecycle
+   - Use Demo Toolbar > "Gerar Relatório"
+
+6. **Integrações** (`/integracoes`)
+   - "Monitoramento de integrações"
+   - Mostre DLQ com 5 exemplos
+   - Use Demo Toolbar > "Reprocessar DLQ"
+
+7. **Health** (`/api/health`)
+   - Abra em nova aba
+   - "Endpoints para Kubernetes"
+   - Mostre status de DB e queue
+
+---
+
 ## Stack
 
 - **Monorepo**: pnpm workspaces

@@ -9,6 +9,7 @@
     "dev": "tsc --watch",
     "migrate": "tsx src/migrate.ts",
     "seed": "tsx src/seed.ts",
+    "seed:demo": "tsx src/seed-demo.ts",
     "csv:import": "tsx src/csv-import.ts",
     "csv:seed-large": "tsx src/csv-seed-large.ts",
     "test": "vitest run",
